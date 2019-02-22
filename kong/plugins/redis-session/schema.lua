@@ -1,10 +1,8 @@
-local Errors = require "kong.dao.errors"
-
 local redis = require "resty.redis"
 
 return {
     fields = {
-        cookie_name = { type = "string", default="SESSION" },
+        session_key = { type = "string", default="SESSION" },
         redis_session_prefix = { type = "string", default = "" },
         redis_host = { type = "string" },
         redis_port = { type = "number", default = 6379 },
@@ -15,11 +13,11 @@ return {
     
     self_check = function(schema, plugin_t, dao, is_updating)
         if not plugin_t.redis_host then
-          return false, Errors.schema "You need to specify a Redis host"
+          return false, string.format "You need to specify a Redis host"
         elseif not plugin_t.redis_port then
-          return false, Errors.schema "You need to specify a Redis port"
+          return false, string.format "You need to specify a Redis port"
         elseif not plugin_t.redis_timeout then
-          return false, Errors.schema "You need to specify a Redis timeout"
+          return false, string.format "You need to specify a Redis timeout"
         end
 
         kong.log('before redis new');
@@ -31,7 +29,7 @@ return {
         local ok, err = red:connect(plugin_t.redis_host, plugin_t.redis_port)
         if not ok then
           kong.log('redis host err', err);
-          return false, Errors.schema "Redis Host unreachable: " .. err
+          return false, string.format "Redis Host unreachable: " .. err
         end
 
         kong.log('before redis conn pwd');
@@ -39,7 +37,7 @@ return {
           local ok, err = red:auth(plugin_t.redis_password)
           if not ok then
               kong.log('redis auth err ', err);
-              return false, Errors.schema "Redis Invalid Credentials: " .. err
+              return false, string.format "Redis Invalid Credentials: " .. err
           end
         end
 

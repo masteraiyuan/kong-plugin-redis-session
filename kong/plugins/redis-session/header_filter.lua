@@ -7,7 +7,7 @@ function _M.execute(conf, ngx)
 
   local ngx_headers = ngx.req.get_headers()
   local ck = cookie:new()
-  local session, err = ck:get(conf.cookie_name)
+  local session, err = ck:get(conf.session_key)
   ngx.log(ngx.ERR, session)
   if not session then
     ngx.log(ngx.ERR, err)
